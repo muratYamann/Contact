@@ -43,10 +43,17 @@ public class MyListAdapter extends BaseAdapter {
          vi = inflater.inflate(R.layout.listview_row, null); // create layout from
 
       TextView textView = (TextView) vi.findViewById(R.id.row_textview); // user name
+      TextView tvNumber = (TextView) vi.findViewById(R.id.rehber_numara); // user name
+      TextView tvId = (TextView) vi.findViewById(R.id.vt_id_textview); // user name
+
+
 
       Kisi kisi = kisilistesi.get(position);
 
-      textView.setText(kisi.getIsim());
+      textView.setText("dataBase   :   "+kisi.getIsim());
+      tvNumber.setText(String.valueOf(kisi.getNumara()));
+
+
       return vi;
    }
 }

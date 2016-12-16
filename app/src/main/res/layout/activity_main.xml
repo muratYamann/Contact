@@ -6,7 +6,7 @@
     tools:context=".MainActivity" >
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -14,16 +14,10 @@
             android:id="@+id/btnVeriTabani"
             android:text="Veri tabanından kayitları göster"
             android:layout_margin="5dp"
-            android:textSize="12sp"
-            android:background="#4CAF50"
-            android:textColor="#fff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_gravity="center"
+            android:gravity="center"
 
-        <Button
-            android:id="@+id/btnVeriTabaniGonder"
-            android:text="Rehberi Gonder"
-            android:layout_margin="5dp"
+            android:textSize="12sp"
             android:background="#4CAF50"
             android:textColor="#fff"
             android:layout_width="wrap_content"

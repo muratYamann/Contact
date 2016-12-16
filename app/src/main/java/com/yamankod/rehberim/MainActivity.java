@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
 	final List<Kisi> kisiler=new ArrayList<Kisi>();
 	public static String TAG ="_Main";
 
-	private Button btnDabase,btnSendDataBase;
+	private Button btnDabase;
 
 	String phoneNumber;
 	ArrayList<String> rehberNumara = new ArrayList<String>();
@@ -48,7 +48,6 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		btnDabase  =(Button)findViewById(R.id.btnVeriTabani);
-		btnSendDataBase =(Button)findViewById(R.id.btnVeriTabaniGonder);
 
 
 		//kişileri ekleme
@@ -114,17 +113,6 @@ public class MainActivity extends Activity {
 
 			}
 		});
-
-
-		btnSendDataBase.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				sendEmail();
-			}
-		});
-
-
-
 
 	}
 
@@ -195,6 +183,9 @@ public class MainActivity extends Activity {
 	}
 
 
+	//verileri  başka bir yere gondermek istersen bu e-mail vb olabilir. MainActivity clasına kodunu ,Activity_main .xml inede
+	//butonumuzu yerleştirip çağırıp sendEmail fonksiyonunu çagırman yeterli
+	//EXTRA_TEXT in  ikinci parametresine Arraylistlere verdimiz verileri ekliyorsun .
 	protected void sendEmail() {
 		Log.i("Send email", "");
 		String[] TO = {""};
