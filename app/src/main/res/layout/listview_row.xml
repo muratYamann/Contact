@@ -8,10 +8,19 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
+
+
     <TextView
         android:id="@+id/row_textview"
         android:layout_width="fill_parent"
         android:layout_height="30dp"
         android:layout_gravity="center" />
 
+
+
+
+
 </LinearLayout>
+
+
+

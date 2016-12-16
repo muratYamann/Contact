@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
 	final List<Kisi> kisiler=new ArrayList<Kisi>();
 	public static String TAG ="_Main";
 
-	private Button btnDabase;
+	private Button btnDabase,btnSendDataBase;
 
 	String phoneNumber;
 	ArrayList<String> rehberNumara = new ArrayList<String>();
@@ -42,23 +42,24 @@ public class MainActivity extends Activity {
 
 
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getPermissionReadContact();
-		getPermissionCallContact();
 
 		btnDabase  =(Button)findViewById(R.id.btnVeriTabani);
+		btnSendDataBase =(Button)findViewById(R.id.btnVeriTabaniGonder);
 
 
 		//kişileri ekleme
 		getNumber(this.getContentResolver());
 
+
 		final ListView listemiz = (ListView) findViewById(R.id.liste);
 		OzelAdapter adaptorumuz=new OzelAdapter(this, kisiler);
 		listemiz.setAdapter(adaptorumuz);
+
+
 
 		listemiz.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -115,6 +116,13 @@ public class MainActivity extends Activity {
 		});
 
 
+		btnSendDataBase.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				sendEmail();
+			}
+		});
+
 
 
 
@@ -125,86 +133,88 @@ public class MainActivity extends Activity {
 
 		Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
-		while (phones.moveToNext()) {
-			String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-			phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-			rehberName.add(name);
-			rehberNumara.add(phoneNumber);
-
-			if (name != null) {
-				kisiler.add(new Kisi(name, phoneNumber));
-			}else {
-				kisiler.add(new Kisi("isim Kayıtlı deil",phoneNumber));
-			}
+		//rehber veri tabanına yedekleme işleminin sadece 1 defa yapılması için shared  ile kontrolü yapılacak
+		SharedPreferences settings = getSharedPreferences("SQL", 0);
+		boolean firstTime = settings.getBoolean("firstTime", true);
 
 
+		if (firstTime) {
 
-			//Veri Tabanı işlemleri
 			DBHelper dbHelper = new DBHelper(getApplicationContext());
 
-			//rehber veri tabanına yedekleme işleminin sadece 1 defa yapılması için shared konrolü yapılacak
-			SharedPreferences settings = getSharedPreferences("SQL", 0);
-			boolean firstTime = settings.getBoolean("firstTime", true);
+			while (phones.moveToNext()) {
+				String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+				phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-		//	if (firstTime) {
+				rehberName.add(name);
+				rehberNumara.add(phoneNumber);
+
+				if (name != null) {
+					kisiler.add(new Kisi(name, phoneNumber));
+				} else {
+					kisiler.add(new Kisi("isim Kayıtlı deil", phoneNumber));
+				}
+
+				//Veri Tabanı işlemleri
 				dbHelper.insertRehber(new Kisi(name, phoneNumber));
-
-				Log.d(TAG, "savedatabase: name:"+name +"phoneNumber: "+phoneNumber);
-
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putBoolean("firstTime", false);
-				editor.commit();
-		//	}
+				Log.d(TAG, "savedatabase: name:" + name + "phoneNumber: " + phoneNumber);
 
 
-
-
-		}
-		phones.close();
-	}
-
-
-	//izin işlemleri
-
-	public void getPermissionReadContact() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
-				!= PackageManager.PERMISSION_GRANTED) {
-
-			if (shouldShowRequestPermissionRationale(
-					Manifest.permission.READ_CONTACTS)) {
 			}
-			requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-					PERMISSIONS_REQUEST_CODE);
-		}
-	}
 
-	public void getPermissionCallContact() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-				!= PackageManager.PERMISSION_GRANTED) {
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putBoolean("firstTime", false);
+			editor.commit();
+			//	}
+			phones.close();
 
-			if (shouldShowRequestPermissionRationale(
-					Manifest.permission.CALL_PHONE)) {
+		}else {
+
+			while (phones.moveToNext()) {
+				String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+				phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+				rehberName.add(name);
+				rehberNumara.add(phoneNumber);
+
+				if (name != null) {
+					kisiler.add(new Kisi(name, phoneNumber));
+				} else {
+					kisiler.add(new Kisi("isim Kayıtlı deil", phoneNumber));
+				}
+
 			}
-			requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-					PERMISSIONS_REQUEST_CODE);
+
+			phones.close();
+
+
 		}
+
+
+
 	}
 
-	@Override
-	public void onRequestPermissionsResult(int requestCode,
-										   @NonNull String permissions[],
-										   @NonNull int[] grantResults) {
-		if (requestCode == PERMISSIONS_REQUEST_CODE) {
-			if (grantResults.length == 1 &&
-					grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this, "permission denied", Toast.LENGTH_SHORT).show();
-			}
-		} else {
-			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		}
-	}
 
+	protected void sendEmail() {
+		Log.i("Send email", "");
+		String[] TO = {""};
+		String[] CC = {""};
+		Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+		emailIntent.setData(Uri.parse("mailto:"));
+		emailIntent.setType("text/plain");
+		emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+		emailIntent.putExtra(Intent.EXTRA_CC, CC);
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Rehberim");
+		emailIntent.putExtra(Intent.EXTRA_TEXT, "Email message goes here");
+
+		try {
+			startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+			finish();
+			Log.d(TAG,"Finished sending email...");
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(MainActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+		}
+
+   }
 }
